@@ -1,0 +1,31 @@
+services:
+  service_users:
+    build: ./service_users
+    container_name: desafio5_users
+    networks:
+      - desafio5_net
+    ports:
+      - "5001:5000"  
+
+  service_orders:
+    build: ./service_orders
+    container_name: desafio5_orders
+    networks:
+      - desafio5_net
+    ports:
+      - "5002:5000"  
+
+  gateway:
+    build: ./gateway
+    container_name: desafio5_gateway
+    networks:
+      - desafio5_net
+    ports:
+      - "8000:8000"
+    depends_on:
+      - service_users
+      - service_orders
+
+networks:
+  desafio5_net:
+    name: desafio5_net

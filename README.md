@@ -222,10 +222,60 @@ A comunicação entre ambos ocorre pelo hostname interno `service_a`, via rede p
 
 <details>
   <summary>Desafio 5</summary>
-  
+
 ## Microsserviços com API Gateway
-* Objetivo: Criar uma arquitetura com API Gateway centralizando o acesso a dois microsserviços.
-* Descrição da solução:
-* Funcionamento explicado: 
-* Passo a passo para execução:
+
+* **Objetivo:** Criar uma arquitetura composta por dois microsserviços independentes, acessados através de um API Gateway centralizado. Os três serviços rodam em containers separados, conectados pela mesma rede Docker.
+
+* **Descrição da solução:**  
+  A solução utiliza três containers:
+  - **service_users:** expõe dados de usuários.
+  - **service_orders:** expõe dados de pedidos.
+  - **gateway:** ponto único de entrada, responsável por repassar as requisições aos serviços internos.
+
+  Cada serviço é um pequeno app Flask com seu próprio Dockerfile.  
+  O `docker-compose.yml` constrói e sobe tudo, gerenciando dependências e expondo apenas o gateway para acesso externo.
+
+* **Funcionamento explicado:**
+  1. O Docker sobe os containers `service_users`, `service_orders` e depois o `gateway`.
+  2. Os serviços internos são acessados **somente pela rede Docker** (`service_users:5000` e `service_orders:5000`).
+  3. O gateway recebe requisições externas nas rotas:
+     - `/users` → repassa para `service_users`
+     - `/orders` → repassa para `service_orders`
+  4. O gateway devolve para o cliente a resposta consolidada.
+  5. Assim, o sistema tem um **único ponto de entrada** mesmo com múltiplos serviços internos.
+
+* **Passo a passo para execução:**
+  1. Suba a arquitetura completa:
+     ```bash
+     docker-compose up --build
+     ```
+
+  2. Teste o gateway:
+     ```bash
+     curl http://localhost:8000/users
+     curl http://localhost:8000/orders
+     ```
+
+  3. Teste os microsserviços diretamente (opcional):
+     ```bash
+     curl http://localhost:5001/users
+     curl http://localhost:5002/orders
+     ```
+
+  4. Derrube os containers:
+     ```bash
+     docker-compose down -v
+     ```
+
+  5. Suba novamente:
+     ```bash
+     docker-compose up
+     ```
+
+  6. Teste o gateway de novo:
+     ```bash
+     curl http://localhost:8000/users
+     curl http://localhost:8000/orders
+     ```
 </details>
