@@ -24,16 +24,30 @@ Ambos ficam na mesma rede nomeada (`desafio_net`), garantindo resolução DNS au
 
 ### Passo a passo para execução
 1. Subir ambiente:
+   ```bash
    ./run.sh
+   ```
 2. Ver containers:
+   ```bash
    docker ps
+   ```
 3. Ver rede criada:   
+  ```bash
   docker network ls | grep desafio_net
+  ```
 4. Acompanhar logs:
-  * Server: docker logs -f desafio_server
-  * Client: docker logs -f desafio_client
+  * Server:
+    ```bash
+    docker logs -f desafio_server
+    ```
+  * Client:
+    ```bash
+    docker logs -f desafio_client
+    ```
 5. Limpeza:
+  ```bash
   ./stop_clean.sh
+  ```
 </details>
 
 
@@ -41,11 +55,47 @@ Ambos ficam na mesma rede nomeada (`desafio_net`), garantindo resolução DNS au
   <summary>Desafio 2</summary>
   
 ## Volumes e persistência
-* Objetivo: Demonstrar persistência de dados usando volumes Docker.
-* Descrição da solução:
-* Funcionamento explicado: 
-* Passo a passo para execução:
+* **Objetivo:** Demonstrar que os dados continuam existindo mesmo após a remoção do container, usando volumes Docker para armazenar o banco fora do container.
+
+* **Descrição da solução:**  
+  A solução usa um container PostgreSQL com um volume nomeado. Um script `init.sql` cria uma tabela e insere um registro inicial. O diretório interno onde o PostgreSQL guarda os dados (`/var/lib/postgresql/data`) é montado em um volume Docker, garantindo que a remoção do container não apague o conteúdo. Ao recriar o container, os dados são carregados a partir do volume.
+
+* **Funcionamento explicado:**  
+  1. O PostgreSQL sobe pela primeira vez.  
+  2. O `init.sql` cria a tabela e insere o primeiro registro.  
+  3. Os dados ficam armazenados no volume `desafio2_data`.  
+  4. O container é destruído com `docker compose down`, mas o volume permanece.  
+  5. Ao subir novamente (`docker compose up -d`), o PostgreSQL carrega tudo do volume.  
+  6. A consulta mostra que os registros continuam lá — provando a persistência.
+
+* **Passo a passo para execução:**
+  1. Suba o container:
+     ```bash
+     docker compose up -d
+     ```
+  2. Verifique o registro inicial no banco:
+     ```bash
+     docker exec -it desafio2_db psql -U user -d teste -c "SELECT * FROM registros;"
+     ```
+  3. Derrube o container:
+     ```bash
+     docker compose down
+     ```
+  4. Confirme que o volume ainda existe:
+     ```bash
+     docker volume ls | grep desafio2_data
+     ```
+  5. Suba novamente:
+     ```bash
+     docker compose up -d
+     ```
+  6. Consulte outra vez para confirmar a persistência:
+     ```bash
+     docker exec -it desafio2_db psql -U user -d teste -c "SELECT * FROM registros;"
+     ```
+
 </details>
+
 
 <details>
   <summary>Desafio 3</summary>
