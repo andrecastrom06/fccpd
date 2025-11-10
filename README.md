@@ -153,12 +153,71 @@ Ambos ficam na mesma rede nomeada (`desafio_net`), garantindo resolução DNS au
 
 <details>
   <summary>Desafio 4</summary>
-  
+
 ## Microsserviços Independentes
-* Objetivo: Criar dois microsserviços independentes que se comunicam via HTTP.
-* Descrição da solução:
-* Funcionamento explicado: 
-* Passo a passo para execução:
+
+### Objetivo
+Criar dois microsserviços independentes que se comunicam via HTTP, cada um rodando em seu próprio container Docker.
+
+### Descrição da solução
+Foram criados dois serviços:
+
+- **Microsserviço A (service_a):**
+  - Expondo o endpoint `/users`
+  - Retorna uma lista JSON de usuários
+  - Implementado em Flask
+  - Container próprio com Dockerfile dedicado
+
+- **Microsserviço B (service_b):**
+  - Consome o microsserviço A via HTTP
+  - Endpoint `/consume` retorna dados combinados
+  - Implementado em Flask + Requests
+  - Container próprio com dependência explícita do serviço A
+
+A comunicação entre ambos ocorre pelo hostname interno `service_a`, via rede padrão criada pelo Docker Compose.
+
+### Funcionamento explicado
+- O **service_a** inicia e disponibiliza a lista de usuários.
+- O **service_b** sobe depois (via `depends_on`) e faz chamadas HTTP para `service_a:5000/users`.
+- Os dois containers estão na mesma rede interna do compose, então não precisam de IP fixo.
+- O acesso externo é feito pelas portas mapeadas:
+  - `5001` → microsserviço A
+  - `5002` → microsserviço B
+
+### Passo a passo para execução
+
+1. **Iniciar os containers**
+   ```bash
+   docker compose up --build -d
+   ```
+
+2. **Listar containers rodando**
+   ```bash
+   docker ps
+   ```
+
+3. **Testar o microsserviço A**
+   ```bash
+   curl http://localhost:5001/users
+   ```
+
+4. **Testar o microsserviço B consumindo o A**
+   ```bash
+   curl http://localhost:5002/consume
+   ```
+
+5. **Ver logs**
+   ```bash
+   docker logs -f desafio4_service_a
+   docker logs -f desafio4_service_b
+   ```
+
+6. **Rebuild caso altere algum app.py**
+   ```bash
+   docker compose down -v
+   docker compose build --no-cache
+   docker compose up -d
+   ```
 </details>
 
 <details>
