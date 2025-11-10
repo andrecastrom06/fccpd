@@ -93,7 +93,6 @@ Ambos ficam na mesma rede nomeada (`desafio_net`), garantindo resolução DNS au
      ```bash
      docker exec -it desafio2_db psql -U user -d teste -c "SELECT * FROM registros;"
      ```
-
 </details>
 
 
@@ -101,10 +100,55 @@ Ambos ficam na mesma rede nomeada (`desafio_net`), garantindo resolução DNS au
   <summary>Desafio 3</summary>
   
 ## Docker Compose Orquestrando Serviços
-* Objetivo: Usar Docker Compose para orquestrar múltiplos serviços dependentes.
-* Descrição da solução:
-* Funcionamento explicado: 
-* Passo a passo para execução:
+* **Objetivo:** Usar Docker Compose para orquestrar três serviços interligados (web, db, cache) utilizando rede interna, variáveis de ambiente e `depends_on`.
+
+* **Descrição da solução:**  
+  A solução utiliza três containers:  
+  - **web:** aplicação Flask que consulta o PostgreSQL e o Redis.  
+  - **db:** banco de dados PostgreSQL para armazenar informações.  
+  - **cache:** serviço Redis usado como cache in-memory.  
+
+  O `docker-compose.yml` define os serviços, as dependências e a rede interna `desafio3_net`, permitindo que os containers se comuniquem via hostname (`web`, `db`, `cache`).  
+  O serviço `web` só inicia após `db` e `cache`, garantindo que as dependências estejam prontas.
+
+* **Funcionamento explicado:**  
+  - O Compose cria e conecta automaticamente os 3 serviços na mesma rede.  
+  - O web acessa o banco via `host=db` e o cache via `host=cache`.  
+  - O PostgreSQL armazena dados em volume interno.  
+  - O Redis mantém informações em memória e responde ao teste de conectividade.  
+  - A rota `/` do Flask retorna o status da comunicação com ambos os serviços.  
+
+* **Passo a passo para execução:**  
+  1. Subir os serviços:
+     ```bash
+     docker compose up -d
+     ```
+  2. Verificar se os containers estão rodando:
+     ```bash
+     docker ps
+     ```
+  3. Testar a comunicação do serviço web:
+     ```bash
+     curl http://localhost:8080/
+     ```
+  4. Validar comunicação entre containers:
+     - Testar PostgreSQL:
+       ```bash
+       docker exec -it desafio3_db psql -U user -d teste -c "SELECT NOW();"
+       ```
+     - Testar Redis:
+       ```bash
+       docker exec -it desafio3_cache redis-cli ping
+       ```
+     - Testar resolução de host:
+       ```bash
+       docker exec -it desafio3_web ping db
+       docker exec -it desafio3_web ping cache
+       ```
+  5. Derrubar tudo:
+     ```bash
+     docker compose down
+     ```
 </details>
 
 <details>

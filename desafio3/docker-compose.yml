@@ -1,0 +1,34 @@
+services:
+  web:
+    container_name: desafio3_web
+    build: ./web
+    ports:
+      - "8080:5000"
+    depends_on:
+      - db
+      - cache
+    environment:
+      DB_HOST: db
+      REDIS_HOST: cache
+
+  db:
+    container_name: desafio3_db
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: teste
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  cache:
+    container_name: desafio3_cache
+    image: redis:7
+    command: ["redis-server", "--appendonly", "yes"]
+
+networks:
+  default:
+    name: desafio3_net
+
+volumes:
+  db_data:
