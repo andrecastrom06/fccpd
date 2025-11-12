@@ -232,9 +232,9 @@ A comunicação entre ambos ocorre pelo hostname interno `service_a`, via rede p
    ```
 
 5. **Encerrar e limpar tudo**
-      ```bash
-      ./run.sh stop
-      ``` 
+   ```bash
+   ./run.sh stop
+   ``` 
 </details>
 
 <details>
@@ -242,9 +242,9 @@ A comunicação entre ambos ocorre pelo hostname interno `service_a`, via rede p
 
 ## Microsserviços com API Gateway
 
-* **Objetivo:** Criar uma arquitetura composta por dois microsserviços independentes, acessados através de um API Gateway centralizado. Os três serviços rodam em containers separados, conectados pela mesma rede Docker.
+### **Objetivo:** Criar uma arquitetura composta por dois microsserviços independentes, acessados através de um API Gateway centralizado. Os três serviços rodam em containers separados, conectados pela mesma rede Docker.
 
-* **Descrição da solução:**  
+### **Descrição da solução:**  
   A solução utiliza três containers:
   - **service_users:** expõe dados de usuários.
   - **service_orders:** expõe dados de pedidos.
@@ -253,7 +253,7 @@ A comunicação entre ambos ocorre pelo hostname interno `service_a`, via rede p
   Cada serviço é um pequeno app Flask com seu próprio Dockerfile.  
   O `docker-compose.yml` constrói e sobe tudo, gerenciando dependências e expondo apenas o gateway para acesso externo.
 
-* **Funcionamento explicado:**
+### **Funcionamento explicado:**
   1. O Docker sobe os containers `service_users`, `service_orders` e depois o `gateway`.
   2. Os serviços internos são acessados **somente pela rede Docker** (`service_users:5000` e `service_orders:5000`).
   3. O gateway recebe requisições externas nas rotas:
@@ -262,37 +262,37 @@ A comunicação entre ambos ocorre pelo hostname interno `service_a`, via rede p
   4. O gateway devolve para o cliente a resposta consolidada.
   5. Assim, o sistema tem um **único ponto de entrada** mesmo com múltiplos serviços internos.
 
-* **Passo a passo para execução:**
+### **Passo a passo para execução:**
   1. Suba a arquitetura completa:
      ```bash
-     docker-compose up --build
+     ./run.sh
      ```
 
-  2. Teste o gateway:
-     ```bash
-     curl http://localhost:8000/users
-     curl http://localhost:8000/orders
-     ```
+  2. Verifique o endpoint:
+   #### Usuários diretos   
+   ```bash
+      http://localhost:5001/users
+   ```
+   #### Pedidos diretos 
+   ```bash
+      http://localhost:5002/orders
+   ```
 
-  3. Teste os microsserviços diretamente (opcional):
-     ```bash
-     curl http://localhost:5001/users
-     curl http://localhost:5002/orders
-     ```
+   #### Gateway centralizando
+   ```bash
+      http://localhost:8000/users
+   ```
+  ```bash
+      http://localhost:8000/orders
+   ```
 
-  4. Derrube os containers:
-     ```bash
-     docker-compose down -v
-     ```
+   #### Health check
+   ```bash
+      http://localhost:8000/health
+   ```
 
-  5. Suba novamente:
-     ```bash
-     docker-compose up
-     ```
-
-  6. Teste o gateway de novo:
-     ```bash
-     curl http://localhost:8000/users
-     curl http://localhost:8000/orders
-     ```
+   3. **Encerrar e limpar tudo**
+   ```bash
+   ./run.sh stop
+   ``` 
 </details>
