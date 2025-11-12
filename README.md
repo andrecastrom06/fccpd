@@ -147,16 +147,19 @@ Ao recriar o container, o banco recarrega automaticamente o conteúdo do volume.
 * **Passo a passo para execução:**  
   1. Subir os serviços:
      ```bash
-     docker compose up -d
+     ./run.sh
      ```
+
   2. Verificar se os containers estão rodando:
      ```bash
      docker ps
      ```
+
   3. Testar a comunicação do serviço web:
      ```bash
      curl http://localhost:8080/
      ```
+
   4. Validar comunicação entre containers:
      - Testar PostgreSQL:
        ```bash
@@ -166,15 +169,11 @@ Ao recriar o container, o banco recarrega automaticamente o conteúdo do volume.
        ```bash
        docker exec -it desafio3_cache redis-cli ping
        ```
-     - Testar resolução de host:
-       ```bash
-       docker exec -it desafio3_web ping db
-       docker exec -it desafio3_web ping cache
-       ```
-  5. Derrubar tudo:
-     ```bash
-     docker compose down
-     ```
+
+   5. **Encerrar e limpar tudo**
+      ```bash
+      ./run.sh stop
+      ```   
 </details>
 
 <details>
