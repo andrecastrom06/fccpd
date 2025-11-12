@@ -1,7 +1,6 @@
 services:
   db:
     image: postgres:15
-    container_name: desafio2_db
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
@@ -10,7 +9,7 @@ services:
       - "5432:5432"
     volumes:
       - desafio2_data:/var/lib/postgresql/data
-      - ./docker.sql:/docker-entrypoint-initdb.d/docker.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   desafio2_data:

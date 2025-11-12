@@ -65,47 +65,62 @@ Criar dois containers que se comunicam usando uma rede Docker customizada criada
 <details>
   <summary>Desafio 2</summary>
   
-## Volumes e persistência
-* **Objetivo:** Demonstrar que os dados continuam existindo mesmo após a remoção do container, usando volumes Docker para armazenar o banco fora do container.
+## Volumes e Persistência
 
-* **Descrição da solução:**  
-  A solução usa um container PostgreSQL com um volume nomeado. Um script `init.sql` cria uma tabela e insere um registro inicial. O diretório interno onde o PostgreSQL guarda os dados (`/var/lib/postgresql/data`) é montado em um volume Docker, garantindo que a remoção do container não apague o conteúdo. Ao recriar o container, os dados são carregados a partir do volume.
+### Objetivo
+Demonstrar que os dados continuam existindo mesmo após a remoção do container, usando **volumes Docker** para armazenar o banco fora do container.
 
-* **Funcionamento explicado:**  
-  1. O PostgreSQL sobe pela primeira vez.  
-  2. O `init.sql` cria a tabela e insere o primeiro registro.  
-  3. Os dados ficam armazenados no volume `desafio2_data`.  
-  4. O container é destruído com `docker compose down`, mas o volume permanece.  
-  5. Ao subir novamente (`docker compose up -d`), o PostgreSQL carrega tudo do volume.  
-  6. A consulta mostra que os registros continuam lá — provando a persistência.
+---
 
-* **Passo a passo para execução:**
-  1. Suba o container:
-     ```bash
-     docker compose up -d
-     ```
-  2. Verifique o registro inicial no banco:
-     ```bash
-     docker exec -it desafio2_db psql -U user -d teste -c "SELECT * FROM registros;"
-     ```
-  3. Derrube o container:
-     ```bash
-     docker compose down
-     ```
-  4. Confirme que o volume ainda existe:
-     ```bash
-     docker volume ls | grep desafio2_data
-     ```
-  5. Suba novamente:
-     ```bash
-     docker compose up -d
-     ```
-  6. Consulte outra vez para confirmar a persistência:
-     ```bash
-     docker exec -it desafio2_db psql -U user -d teste -c "SELECT * FROM registros;"
-     ```
+### Descrição da Solução
+A solução usa um container **PostgreSQL** com um volume nomeado.  
+O script `init.sql` cria uma tabela e insere um registro inicial.  
+O diretório interno do PostgreSQL (`/var/lib/postgresql/data`) é montado em um volume Docker (`desafio2_data`), garantindo que a remoção do container não apague os dados.  
+Ao recriar o container, o banco recarrega automaticamente o conteúdo do volume.
+
+---
+
+### Funcionamento
+1. O PostgreSQL sobe pela primeira vez.  
+2. O `init.sql` cria a tabela e insere o primeiro registro.  
+3. Os dados ficam armazenados no volume `desafio2_data`.  
+4. O container é removido com `./run.sh stop`, mas o volume permanece.  
+5. Ao subir novamente (`./run.sh`), o PostgreSQL lê os dados do volume.  
+6. A consulta mostra que os registros continuam lá — provando a persistência.
+
+---
+
+### 🚀 Passo a Passo
+1. **Subir o container**
+   ```bash
+   ./run.sh
+   ```
+
+2. **Verificar o registro inicial**
+   ```bash
+   docker exec -it $(docker ps -qf "ancestor=postgres:15") psql -U user -d teste -c "SELECT * FROM registros;"
+   ```
+
+3. **Parar e limpar tudo (inclusive volume)**
+   ```bash
+   ./run.sh stop
+   ```
+
+4. **Subir novamente**
+   ```bash
+   ./run.sh
+   ```
+
+5. **Confirmar que o dado ainda existe**
+   ```bash
+   docker exec -it $(docker ps -qf "ancestor=postgres:15") psql -U user -d teste -c "SELECT * FROM registros;"
+   ```
+
+6. **Encerrar e limpar tudo**
+   ```bash
+   ./run.sh stop
+   ```  
 </details>
-
 
 <details>
   <summary>Desafio 3</summary>
