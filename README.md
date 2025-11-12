@@ -9,45 +9,56 @@ Projeto da cadeira de Fundamentos de Computação Concorrente, Paralela e Distri
 ## Containers em Rede
 
 ### Objetivo
-Criar dois containers que se comunicam usando uma rede Docker customizada criada pelo docker-compose.
+Criar dois containers que se comunicam usando uma rede Docker customizada criada pelo `docker-compose`.
 
-### Descrição da solução
-Um container roda um servidor Flask simples expondo `/`.  
-Outro container roda um script que faz `curl` periódico para o servidor.  
-Ambos ficam na mesma rede nomeada (`desafio_net`), garantindo resolução DNS automática (`server` → IP do container).
+---
 
-### Funcionamento explicado
-- O `server` sobe um Flask escutando em `0.0.0.0:8080`.  
-- O `client` usa `curl http://server:8080/` em loop.  
-- Como os dois containers estão na mesma rede, o hostname `server` funciona sem configurar IP.  
-- Os logs mostram requisições com timestamps.
+### Descrição da Solução
+- Um container roda um servidor **Flask** simples expondo `/`.
+- Outro container roda um script que faz requisições periódicas usando **curl**.
+- Ambos estão na mesma rede nomeada (`desafio_net`), o que permite que o hostname `server` resolva automaticamente para o IP do container.
 
-### Passo a passo para execução
-1. Subir ambiente:
+---
+
+### Funcionamento
+- O **server** escuta em `0.0.0.0:8080`.
+- O **client** envia `curl http://server:8080/` em loop com intervalo configurável.
+- A comunicação é feita via DNS interno do Docker.
+- Os logs mostram o horário e status HTTP de cada requisição.
+
+---
+
+### Passo a Passo
+1. **Subir o ambiente**
    ```bash
    ./run.sh
    ```
-2. Ver containers:
+
+2. **Ver containers ativos**
    ```bash
-   docker ps
+   ./run.sh
    ```
-3. Ver rede criada:   
-  ```bash
-  docker network ls | grep desafio_net
-  ```
-4. Acompanhar logs:
-  * Server:
-    ```bash
-    docker logs -f desafio_server
-    ```
-  * Client:
-    ```bash
-    docker logs -f desafio_client
-    ```
-5. Limpeza:
-  ```bash
-  ./stop_clean.sh
-  ```
+
+3. **Confirmar a rede criada**
+   ```bash
+   docker network ls | grep desafio_net
+   ```
+
+4. **Acompanhar logs**
+   #### Server
+      ```bash
+      docker logs -f desafio_server
+      ```
+
+   #### Client
+      ```bash
+      docker logs -f desafio_client
+      ```   
+
+5. **Encerrar e limpar tudo**
+   ```bash
+   ./run.sh stop
+   ```   
 </details>
 
 
