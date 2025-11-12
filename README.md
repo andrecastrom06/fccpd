@@ -213,7 +213,7 @@ A comunicação entre ambos ocorre pelo hostname interno `service_a`, via rede p
 
 1. **Iniciar os containers**
    ```bash
-   docker compose up --build -d
+   ./run.sh
    ```
 
 2. **Listar containers rodando**
@@ -228,21 +228,13 @@ A comunicação entre ambos ocorre pelo hostname interno `service_a`, via rede p
 
 4. **Testar o microsserviço B consumindo o A**
    ```bash
-   curl http://localhost:5002/consume
+   curl http://localhost:6001/
    ```
 
-5. **Ver logs**
-   ```bash
-   docker logs -f desafio4_service_a
-   docker logs -f desafio4_service_b
-   ```
-
-6. **Rebuild caso altere algum app.py**
-   ```bash
-   docker compose down -v
-   docker compose build --no-cache
-   docker compose up -d
-   ```
+5. **Encerrar e limpar tudo**
+      ```bash
+      ./run.sh stop
+      ``` 
 </details>
 
 <details>

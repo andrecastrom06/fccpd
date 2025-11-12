@@ -1,14 +1,16 @@
 services:
   service_a:
     build: ./service_a
-    container_name: desafio4_service_a
     ports:
       - "5001:5000"
 
   service_b:
     build: ./service_b
-    container_name: desafio4_service_b
     ports:
       - "6001:6000"
     depends_on:
       - service_a
+
+networks:
+  default:
+    name: desafio4_net
